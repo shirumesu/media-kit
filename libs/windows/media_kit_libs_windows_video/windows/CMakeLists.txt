@@ -66,21 +66,28 @@ endfunction()
 
 # Detect architecture and set appropriate libmpv archive
 if(${FLUTTER_TARGET_PLATFORM} STREQUAL "windows-x64")
+  # MelonBanG: mpv's own Windows build (shinchiro's, linked from mpv.io), whose
+  # SourceForge folder keeps every weekly release. Builds before mpv's fix of
+  # 2026-07-31 never load the D3D11-to-ANGLE interop and copy every frame.
   set(LIBMPV_ARCH "x86_64")
-  set(LIBMPV "mpv-dev-x86_64-20241021-git-0f78584.7z")
-  set(LIBMPV_MD5 "6ecf18e85b093c3f7edb16f3ee6603f3")
+  set(LIBMPV "mpv-dev-x86_64-20261018-git-01e2533f31.7z")
+  set(LIBMPV_MD5 "5ca2e48b297f05367eb355ab1e068284")
+  set(LIBMPV_URL "https://downloads.sourceforge.net/project/mpv-player-windows/libmpv/${LIBMPV}")
 else()
   set(LIBMPV_ARCH "aarch64")
   set(LIBMPV "mpv-dev-aarch64-20241021-git-0f78584.7z")
   set(LIBMPV_MD5 "5b507a35db13eee6cb7eb21e8be7c83d")
+  set(LIBMPV_URL "https://github.com/media-kit/libmpv-win32-video-cmake/releases/download/20241021/${LIBMPV}")
 endif()
-
-# Download URL for the libmpv archive from the latest release
-set(LIBMPV_URL "https://github.com/media-kit/libmpv-win32-video-cmake/releases/download/20241021/${LIBMPV}")
 
 # Download location of the libmpv archive.
 set(LIBMPV_ARCHIVE "${CMAKE_BINARY_DIR}/${LIBMPV}")
 set(LIBMPV_SRC "${CMAKE_BINARY_DIR}/libmpv")
+
+# MelonBanG: a new archive replaces the libraries extracted from the previous.
+if(NOT EXISTS "${LIBMPV_ARCHIVE}")
+  file(REMOVE_RECURSE "${LIBMPV_SRC}")
+endif()
 
 download_and_verify(
   ${LIBMPV_URL}
